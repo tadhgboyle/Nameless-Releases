@@ -29,7 +29,7 @@ class Releases_Module extends Module
         $pages->add('Releases', '/panel/releases', 'pages/panel/releases.php');
         $pages->add('Releases', '/panel/releases/edit', 'pages/panel/labels.php');
 
-        Util::loadEndpoints(join(DIRECTORY_SEPARATOR, array(ROOT_PATH, 'modules', 'Releases', 'classes', 'api')), $endpoints);
+        $pages->add('Releases', '/api/update_check', 'pages/api/update_check.php');
     }
 
     public function onInstall()
@@ -37,7 +37,7 @@ class Releases_Module extends Module
         $queries = new Queries();
 
         if (!$queries->tableExists('releases')) {
-            $queries->createTable('releases', "`id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(36) NOT NULL, `version_tag` varchar(36) NOT NULL UNIQUE, `created_at` int(36) NOT NULL, `required_version` varchar(36) NOT NULL UNIQUE, `download_link` varchar(256) NOT NULL, `urgent` int(1) NOT NULL, `install_instructions` text NOT NULL", "ENGINE=InnoDB DEFAULT CHARSET=latin1");
+            $queries->createTable('releases', "`id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(36) NOT NULL UNIQUE, `version_tag` varchar(36) NOT NULL UNIQUE, `created_at` int(36) NOT NULL, `required_version` varchar(36) NOT NULL, `download_link` varchar(256) NOT NULL, `urgent` int(1) NOT NULL, `install_instructions` text NOT NULL", "ENGINE=InnoDB DEFAULT CHARSET=latin1");
         }
     }
 
