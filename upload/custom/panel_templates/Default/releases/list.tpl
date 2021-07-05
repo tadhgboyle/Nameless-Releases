@@ -36,7 +36,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-9">
-                                    <p style="margin-top: 7px; margin-bottom: 7px;">aaaa</p>
+                                    <p style="margin-top: 7px; margin-bottom: 7px;">View all releases of NamelessMC.</p>
                                 </div>
                                 <div class="col-md-3">
                                     <span class="float-md-right"><a href="{$NEW_LINK}" class="btn btn-primary"><i class="fas fa-plus-circle"></i> New Release</a></span>
@@ -70,12 +70,12 @@
                                         <tr>
                                             <td>{$release['name']}</td>
                                             <td><kbd>{$release['version_tag']}</kbd></td>
-                                            <td><a href="{$release['download_link']}" target="_blank" class="btn btn-success btn-sm"><i class="fa fa-fw fa-link"></i> Link</a></td>
+                                            <td><a href="{$release['github_link']}" target="_blank" class="btn btn-success btn-sm"><i class="fab fa-fw fa-github"></i> Link</a></td>
                                             <td><kbd>{$release['required_version']}</kbd></td>
                                             <td>{if $release['urgent']} True {else} False {/if}</td>
                                             <td>{$release['created_at']}</td>
                                             <td>
-                                                <a href="{$EDIT_LINK}{$announcement[0]->id}" class="btn btn-warning btn-sm"><i class="fa fa-fw fa-edit"></i></a>
+                                                <a href="{$EDIT_LINK}{$release['id']}" class="btn btn-warning btn-sm"><i class="fa fa-fw fa-edit"></i></a>
                                             </td>
                                         </tr>
                                         {/foreach}

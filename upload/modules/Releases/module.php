@@ -15,7 +15,7 @@ class Releases_Module extends Module
     /** @var Language */
     private $_language;
 
-    public function __construct(Pages $pages, Language $language, Endpoints $endpoints)
+    public function __construct(Pages $pages, Language $language)
     {
         $this->_language = $language;
 
@@ -30,6 +30,8 @@ class Releases_Module extends Module
         $pages->add('Releases', '/panel/releases/edit', 'pages/panel/labels.php');
 
         $pages->add('Releases', '/api/update_check', 'pages/api/update_check.php');
+        $pages->add('Releases', '/api/latest_update', 'pages/api/latest_update.php');
+        $pages->add('Releases', '/api/all_updates', 'pages/api/all_updates.php');
     }
 
     public function onInstall()
@@ -37,7 +39,7 @@ class Releases_Module extends Module
         $queries = new Queries();
 
         if (!$queries->tableExists('releases')) {
-            $queries->createTable('releases', "`id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(36) NOT NULL UNIQUE, `version_tag` varchar(36) NOT NULL UNIQUE, `created_at` int(36) NOT NULL, `required_version` varchar(36) NOT NULL, `download_link` varchar(256) NOT NULL, `urgent` int(1) NOT NULL, `install_instructions` text NOT NULL", "ENGINE=InnoDB DEFAULT CHARSET=latin1");
+            $queries->createTable('releases', "`id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(36) NOT NULL UNIQUE, `version_tag` varchar(36) NOT NULL UNIQUE, `github_release_id` int(11) NOT NULL UNIQUE, `required_version` varchar(36) NOT NULL UNIQUE, `urgent` int(1) NOT NULL, `install_instructions` text NOT NULL, `created_at` int(36) NOT NULL", "ENGINE=InnoDB DEFAULT CHARSET=latin1");
         }
     }
 
