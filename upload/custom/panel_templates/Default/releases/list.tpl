@@ -72,7 +72,13 @@
                                             <td><kbd>{$release['version_tag']}</kbd></td>
                                             <td><a href="{$release['github_link']}" target="_blank" class="btn btn-success btn-sm"><i class="fab fa-fw fa-github"></i> Link</a></td>
                                             <td><kbd>{$release['required_version']}</kbd></td>
-                                            <td>{if $release['urgent']} True {else} False {/if}</td>
+                                            <td>
+                                                {if $release['urgent']}
+                                                    <i class="fa fa-check-circle text-success"></i>
+                                                {else}
+                                                    <i class="fa fa-times-circle text-danger"></i>
+                                                {/if}
+                                            </td>
                                             <td>{$release['created_at']}</td>
                                             <td>
                                                 <a href="{$EDIT_LINK}{$release['id']}" class="btn btn-warning btn-sm"><i class="fa fa-fw fa-edit"></i></a>

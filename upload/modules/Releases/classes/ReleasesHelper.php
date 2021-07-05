@@ -18,6 +18,38 @@ class ReleasesHelper
         return self::$_instance;
     }
 
+    public function getReleases()
+    {
+        if (isset($this->_releases)) {
+            return $this->_releases;
+        }
+
+        if (!isset($this->_releases_query)) {
+            $this->_releases_query = DB::getInstance()->query("SELECT * FROM nl2_releases ORDER BY created_at DESC")->results();
+        }
+
+        $data = [];
+
+        foreach ($this->_releases_query as $release) {
+            $data[] = [
+                'id' => $release->id,
+                'name' => $release->name,
+                'version_tag' => $release->version_tag,
+                'required_version' => $release->required_version,
+                'github_release_id' => $release->github_release_id,
+                'github_link' => $this->getReleaseLinkFromId($release->github_release_id),
+                'required_version' => $release->required_version,
+                'urgent' => (bool) $release->urgent,
+                'created_at' => strftime('%B %e, %Y @ %I:%M %p', $release->created_at),
+                'install_instructions' => $release->install_instructions,
+            ];
+        }
+
+        $this->_releases = $data;
+
+        return $this->_releases;
+    }
+
     public function getGithubReleases()
     {
         if (!isset($this->_github_releases)) {
@@ -54,38 +86,6 @@ class ReleasesHelper
         }
 
         return null;
-    }
-
-    public function getReleases()
-    {
-        if (isset($this->_releases)) {
-            return $this->_releases;
-        }
-
-        if (!isset($this->_releases_query)) {
-            $this->_releases_query = DB::getInstance()->query("SELECT * FROM nl2_releases ORDER BY created_at DESC")->results();
-        }
-
-        $data = [];
-
-        foreach ($this->_releases_query as $release) {
-            $data[] = [
-                'id' => $release->id,
-                'name' => $release->name,
-                'version_tag' => $release->version_tag,
-                'required_version' => $release->required_version,
-                'github_release_id' => $release->github_release_id,
-                'github_link' => $this->getReleaseLinkFromId($release->github_release_id),
-                'required_version' => $release->required_version,
-                'urgent' => (bool) $release->urgent,
-                'created_at' => strftime('%B %e, %Y @ %I:%M %p', $release->created_at),
-                'install_instructions' => $release->install_instructions,
-            ];
-        }
-
-        $this->_releases = $data;
-
-        return $this->_releases;
     }
 
     private function getReleaseLinkFromId(int $release_id)

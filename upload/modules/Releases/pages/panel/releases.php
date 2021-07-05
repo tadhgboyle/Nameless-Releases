@@ -1,4 +1,7 @@
 <?php
+
+// TODO: Success/error messages, release deleting, statistics stuff
+
 if (!$user->handlePanelPageLoad('admincp.releases')) {
     require_once(ROOT_PATH . '/403.php');
     die();
@@ -24,6 +27,10 @@ if (!isset($_GET['action'])) {
 
         $editing_release = ReleasesHelper::getInstance()->getRelease($_GET['id']);
 
+        if ($editing_release == null) {
+            Redirect::to(URL::build('/panel/releases'));
+        }
+
         if (Input::exists()) {
 
             DB::getInstance()->update('releases', $editing_release['id'], [
@@ -45,10 +52,6 @@ if (!isset($_GET['action'])) {
             Redirect::to(URL::build('/panel/releases'));
 
         } else {
-
-            if ($editing_release == null) {
-                Redirect::to(URL::build('/panel/releases'));
-            }
 
             $smarty->assign(array(
                 'EDITING_RELEASE' => $editing_release,
