@@ -20,7 +20,7 @@ if (!isValidSiteId($data['uid'])) {
     ]));
 }
 
-StatisticsHandler::getInstance()->handleRequest($data);
+StatisticsHandler::handleRequest($data);
 
 $new_update = ReleasesHelper::getInstance()->getUpdateForVersion($data['version']);
 
