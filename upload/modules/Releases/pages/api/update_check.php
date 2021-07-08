@@ -33,6 +33,7 @@ if ($new_update == null) {
 }
 
 die(json_encode([
+    'error' => false,
     'update_available' => true,
     'name' => $new_update['name'],
     'version_tag' => $new_update['version_tag'],

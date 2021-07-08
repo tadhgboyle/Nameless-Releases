@@ -1,6 +1,6 @@
 <?php
 
-// TODO: Success/error messages, release deleting, statistics stuff
+// TODO: release deleting
 
 if (!$user->handlePanelPageLoad('admincp.releases')) {
     require_once(ROOT_PATH . '/403.php');
@@ -31,15 +31,15 @@ if (!isset($_GET['action'])) {
             Redirect::to(URL::build('/panel/releases'));
         }
 
-        if (Input::exists()) {
+        if (Input::exists()) { 
 
             DB::getInstance()->update('releases', $editing_release['id'], [
                 'name' => Output::getClean(Input::get('name')),
                 'version_tag' => Output::getClean(Input::get('version_tag')),
-                'required_version' => Output::getClean(Input::get('required_version')),
                 'github_release_id' => Output::getClean(Input::get('github_release_id')),
-                'urgent' => isset($_POST['urgent']) ? 1 : 0,
+                'required_version' => Output::getClean(Input::get('required_version')),
                 'install_instructions' => Output::getClean(Input::get('install_instructions')),
+                'urgent' => isset($_POST['urgent']) ? 1 : 0,
             ]);
 
             $cache_key = 'github_release_link-' . $release_id;
@@ -48,6 +48,10 @@ if (!isset($_GET['action'])) {
             if ($cache->isCached($cache_key)) {
                 $cache->erase($cache_key);
             }
+
+            GithubHelper::getInstance()->resetCache();
+
+            Session::flash('releases_success', 'Updated a Release: ' . Input::get('name'));
 
             Redirect::to(URL::build('/panel/releases'));
 
@@ -62,24 +66,55 @@ if (!isset($_GET['action'])) {
 
         if (Input::exists()) {
 
-            DB::getInstance()->insert('releases', [
-                'name' => Output::getClean(Input::get('name')),
-                'version_tag' => Output::getClean(Input::get('version_tag')),
-                'required_version' => Output::getClean(Input::get('required_version')),
-                'github_release_id' => Output::getClean(Input::get('github_release_id')),
-                'urgent' => isset($_POST['urgent']) ? 1 : 0,
-                'install_instructions' => Output::getClean(Input::get('install_instructions')),
-                'created_at' => time(),
+            $validator = (new Validate())->check($_POST, [
+                'name' => [
+                    Validate::REQUIRED,
+                    Validate::UNIQUE => 'releases'
+                ],
+                'version_tag' => [
+                    Validate::REQUIRED,
+                    Validate::UNIQUE => 'releases'
+                ],
+                'github_release_id' => [
+                    Validate::REQUIRED,
+                    Validate::UNIQUE => 'releases'
+                ],
+                'required_version' => [
+                    Validate::REQUIRED,
+                    Validate::UNIQUE => 'releases'
+                ],
+                'install_instructions' => Validate::REQUIRED
             ]);
 
-            Redirect::to(URL::build('/panel/releases'));
-        }
+            if (!$validator->passed()) {
+                Session::flash('releases_errors', $validator->errors());
+                
+                Redirect::to(URL::build('/panel/releases', 'action=new'));
 
+            } else {
+
+                DB::getInstance()->insert('releases', [
+                    'name' => Output::getClean(Input::get('name')),
+                    'version_tag' => Output::getClean(Input::get('version_tag')),
+                    'required_version' => Output::getClean(Input::get('required_version')),
+                    'github_release_id' => Output::getClean(Input::get('github_release_id')),
+                    'urgent' => isset($_POST['urgent']) ? 1 : 0,
+                    'install_instructions' => Output::getClean(Input::get('install_instructions')),
+                    'created_at' => time(),
+                ]);
+
+                GithubHelper::getInstance()->resetCache();
+
+                Session::flash('releases_success', 'Created new Release: ' . Input::get('name'));
+
+                Redirect::to(URL::build('/panel/releases'));
+            }
+        }
     }
 
     $smarty->assign(array(
         'BACK_LINK' => URL::build('/panel/releases'),
-        'GITHUB_RELEASES' => ReleasesHelper::getInstance()->getGithubReleases(),
+        'GITHUB_RELEASES' => GithubHelper::getInstance()->getGithubReleases(),
     ));
 
     $template_file = 'releases/form.tpl';
@@ -87,6 +122,20 @@ if (!isset($_GET['action'])) {
 
 // Load modules + template
 Module::loadPage($user, $pages, $cache, $smarty, array($navigation, $cc_nav, $mod_nav), $widgets);
+
+if (Session::exists('releases_errors')) {
+    $smarty->assign(array(
+        'ERRORS_TITLE' => $language->get('general', 'error'),
+        'ERRORS' => Session::flash('releases_errors')
+    ));
+}
+
+if (Session::exists('releases_success')) {
+    $smarty->assign(array(
+        'SUCCESS_TITLE' => $language->get('general', 'success'),
+        'SUCCESS' => Session::flash('releases_success')
+    ));
+}
 
 $smarty->assign(array(
     'PAGE' => PANEL_PAGE,
