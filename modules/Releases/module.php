@@ -1,8 +1,6 @@
 <?php
 /*
  *	Made by Aberdeener
- *  https://github.com/NamelessMC/Nameless/
- *  NamelessMC version 2.0.0-pr10
  *
  *  License: MIT
  *
@@ -11,9 +9,7 @@
 
 class Releases_Module extends Module
 {
-
-    /** @var Language */
-    private $_language;
+    private Language $_language;
 
     public function __construct(Pages $pages, Language $language)
     {
@@ -22,7 +18,7 @@ class Releases_Module extends Module
         $name = 'Releases';
         $author = '<a href="https://tadhg.sh" target="_blank" rel="nofollow noopener">Aberdeener</a>';
         $module_version = '0.1.0';
-        $nameless_version = '2.0.0-pr10';
+        $nameless_version = '2.0.0-pr12';
 
         parent::__construct($this, $name, $author, $module_version, $nameless_version);
 
@@ -39,7 +35,7 @@ class Releases_Module extends Module
         $queries = new Queries();
 
         if (!$queries->tableExists('releases')) {
-            $queries->createTable('releases', "`id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(36) NOT NULL UNIQUE, `version_tag` varchar(36) NOT NULL UNIQUE, `github_release_id` int(11) NOT NULL UNIQUE, `required_version` varchar(36) NOT NULL UNIQUE, `urgent` int(1) NOT NULL, `install_instructions` text NOT NULL, `created_at` int(36) NOT NULL", "ENGINE=InnoDB DEFAULT CHARSET=latin1");
+            $queries->createTable('releases', "`id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(36) NOT NULL UNIQUE, `version_tag` varchar(36) NOT NULL UNIQUE, `github_release_id` int(11) NOT NULL UNIQUE, `required_version` varchar(36) NOT NULL UNIQUE, `urgent` int(1) NOT NULL, `install_instructions` text NOT NULL, `created_at` int(36) NOT NULL, PRIMARY KEY (id)", "ENGINE=InnoDB DEFAULT CHARSET=latin1");
         }
     }
 
@@ -69,12 +65,7 @@ class Releases_Module extends Module
             return;
         }
 
-        // Add link to StaffCP sidebar
         $cache->setCache('navbar_icons');
-        if (!$cache->isCached('releases_icon'))
-            $icon = '';
-        else
-            $icon = $cache->retrieve('releases_icon');
 
         $cache->setCache('panel_sidebar');
         if (!$cache->isCached('releases_order')) {
@@ -93,5 +84,10 @@ class Releases_Module extends Module
 
         $navs[2]->add('releases_divider', 'Releases', 'divider', 'top', null, $order, '');
         $navs[2]->add('releases', 'Releases', URL::build('/panel/releases'), 'top', null, $order + 0.2, $icon);
+    }
+
+    function getDebugInfo(): array
+    {
+        return [];
     }
 }

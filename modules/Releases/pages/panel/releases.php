@@ -42,7 +42,7 @@ if (!isset($_GET['action'])) {
                 'urgent' => isset($_POST['urgent']) ? 1 : 0,
             ]);
 
-            $cache_key = 'github_release_link-' . $release_id;
+            $cache_key = 'github_release_link-' . $editing_release['id'];
     
             $cache->setCache('releases');
             if ($cache->isCached($cache_key)) {
@@ -121,7 +121,7 @@ if (!isset($_GET['action'])) {
 }
 
 // Load modules + template
-Module::loadPage($user, $pages, $cache, $smarty, array($navigation, $cc_nav, $mod_nav), $widgets);
+Module::loadPage($user, $pages, $cache, $smarty, array($navigation, $cc_nav, $mod_nav), $widgets, $template);
 
 if (Session::exists('releases_errors')) {
     $smarty->assign(array(

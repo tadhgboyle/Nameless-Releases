@@ -12,14 +12,6 @@ if (!isset($_GET['uid']) || !isset($_GET['version'])) {
 
 $data = $_GET;
 
-if (!isValidSiteId($data['uid'])) {
-    die(json_encode([
-        'error' => true,
-        'update_available' => false,
-        'message' => 'Invalid site unique id'
-    ]));
-}
-
 StatisticsHandler::handleRequest($data);
 
 $new_update = ReleasesHelper::getInstance()->getUpdateForVersion($data['version']);
@@ -41,7 +33,3 @@ die(json_encode([
     'urgent' => (bool) $new_update['urgent'],
     'install_instructions' => $new_update['install_instructions'],
 ]));
-
-function isValidSiteId(string $id) {
-    return true;
-}
