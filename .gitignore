@@ -1,0 +1,15 @@
+/*
+
+!.gitignore
+
+!/modules
+/modules/*
+!/modules/Releases
+
+!/custom
+/custom/*
+!/custom/panel_templates
+
+!/custom/panel_templates/Default
+/custom/panel_templates/Default/*
+!/custom/panel_templates/Default/releases
