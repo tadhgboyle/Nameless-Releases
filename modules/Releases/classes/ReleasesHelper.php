@@ -4,7 +4,7 @@ class ReleasesHelper extends Instanceable
 {
     private array $releases;
 
-    public function getReleases()
+    public function getReleases(): array
     {
         if (isset($this->releases)) {
             return $this->releases;

@@ -5,14 +5,14 @@ class GithubHelper extends Instanceable
     private Cache $cache;
     private array $githubReleases;
 
-    private function __construct()
+    public function __construct()
     {
         $this->cache = new Cache();
     }
 
     /**
      * Get array of all GitHub releases which have not been assigned to a NamelessMC release yet.
-     * 
+     *
      * @return array GitHub releases
      */
     public function getGithubReleases(): array
@@ -69,12 +69,11 @@ class GithubHelper extends Instanceable
 
     private function callGithubApi(string $url): object
     {
-        return json_decode(
-            HttpClient::get($url, [
-                'Accept: application/json',
-                'Content-Type: application/json',
-                'Authorization: token ' . Config::get('github_token'),
-            ])->data()
-        );
+        return HttpClient::get($url, [
+            CURLOPT_ACCEPT_ENCODING => 'application/json',
+            CURLINFO_CONTENT_TYPE => 'application/json',
+            CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 GTB5',
+            CURLOPT_HEADER => 'Authorization: token ' . Config::get('github_token'),
+        ])->json();
     }
 }

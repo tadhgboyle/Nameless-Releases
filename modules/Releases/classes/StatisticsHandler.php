@@ -4,7 +4,6 @@ class StatisticsHandler
 {
 
     public static function handleRequest(array $data) {
-
         try {
             $mysqli = new mysqli(Config::get('stats_credentials'));
         } catch (Exception $e) {
