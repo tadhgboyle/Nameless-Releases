@@ -1,14 +1,13 @@
 <?php
 
-class ReleasesHelper extends Instanceable
-{
+class ReleasesHelper extends Instanceable {
+
     private array $releases;
 
     /**
      * @return Release[]
      */
-    public function getReleases(): array
-    {
+    public function getReleases(): array {
         if (isset($this->releases)) {
             return $this->releases;
         }
@@ -19,13 +18,13 @@ class ReleasesHelper extends Instanceable
 
         foreach ($releasesFromDatabase as $release) {
             $releases[] = new Release([
-                'id' => (int) $release->id,
+                'id' => (int)$release->id,
                 'name' => $release->name,
                 'version_tag' => $release->version_tag,
                 'required_version' => $release->required_version,
                 'github_release_id' => $release->github_release_id,
                 'github_link' => GithubHelper::getInstance()->getGithubReleaseLinkFromId($release->github_release_id),
-                'urgent' => (bool) $release->urgent,
+                'urgent' => (bool)$release->urgent,
                 'created_at' => strftime('%B %e, %Y @ %I:%M %p', $release->created_at),
                 'install_instructions' => $release->install_instructions,
             ]);
@@ -34,8 +33,7 @@ class ReleasesHelper extends Instanceable
         return $this->releases ??= $releases;
     }
 
-    public function getRelease(int $id): ?Release
-    {
+    public function getRelease(int $id): ?Release {
         foreach ($this->getReleases() as $release) {
             if ($release->getId() === $id) {
                 return $release;
@@ -45,8 +43,7 @@ class ReleasesHelper extends Instanceable
         return null;
     }
 
-    public function getUpdateForVersion(string $version): ?Release
-    {
+    public function getUpdateForVersion(string $version): ?Release {
         foreach ($this->getReleases() as $release) {
             if ($release->isApproved() && $release->getRequiredVersion() === $version) {
                 return $release;

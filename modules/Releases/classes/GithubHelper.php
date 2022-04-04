@@ -1,12 +1,11 @@
 <?php
 
-class GithubHelper extends Instanceable
-{
+class GithubHelper extends Instanceable {
+
     private Cache $cache;
     private array $githubReleases;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->cache = new Cache();
     }
 
@@ -15,8 +14,7 @@ class GithubHelper extends Instanceable
      *
      * @return array GitHub releases
      */
-    public function getGithubReleases(): array
-    {
+    public function getGithubReleases(): array {
         if (isset($this->githubReleases)) {
             return $this->githubReleases;
         }
@@ -42,8 +40,7 @@ class GithubHelper extends Instanceable
         return $this->githubReleases ??= $githubReleases;
     }
 
-    public function resetCache(): void
-    {
+    public function resetCache(): void {
         $this->cache->setCache('releases');
 
         if ($this->cache->isCached('github_releases')) {
@@ -51,8 +48,7 @@ class GithubHelper extends Instanceable
         }
     }
 
-    public function getGithubReleaseLinkFromId(int $githubReleaseId): string
-    {
+    public function getGithubReleaseLinkFromId(int $githubReleaseId): string {
         $this->cache->setCache('releases');
 
         $cacheKey = "github_release_link-{$githubReleaseId}";
@@ -67,8 +63,7 @@ class GithubHelper extends Instanceable
         return $releaseLink;
     }
 
-    private function callGithubApi(string $url): object
-    {
+    private function callGithubApi(string $url): object {
         return HttpClient::get($url, [
             CURLOPT_ACCEPT_ENCODING => 'application/json',
             CURLINFO_CONTENT_TYPE => 'application/json',
