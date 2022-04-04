@@ -2,7 +2,7 @@
 
 header('Content-Type: application/json');
 
-if (!isset($_GET['uid']) || !isset($_GET['version'])) {
+if (!isset($_GET['uid'], $_GET['version'])) {
     die(json_encode([
         'error' => true,
         'update_available' => false,
@@ -16,7 +16,7 @@ StatisticsHandler::handleRequest($data);
 
 $new_update = ReleasesHelper::getInstance()->getUpdateForVersion($data['version']);
 
-if ($new_update == null) {
+if ($new_update === null) {
     die(json_encode([
         'error' => false,
         'update_available' => false,
@@ -24,12 +24,11 @@ if ($new_update == null) {
     ]));
 }
 
-die(json_encode([
+$return = [
     'error' => false,
     'update_available' => true,
-    'name' => $new_update['name'],
-    'version_tag' => $new_update['version_tag'],
-    'download_link' => $new_update['download_link'],
-    'urgent' => (bool) $new_update['urgent'],
-    'install_instructions' => $new_update['install_instructions'],
-]));
+];
+
+die(json_encode(array_merge(
+    $return, $new_update->toArray()
+)));

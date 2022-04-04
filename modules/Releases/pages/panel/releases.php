@@ -1,6 +1,6 @@
 <?php
 
-// TODO: release deleting
+// TODO: release deleting + approval
 
 if (!$user->handlePanelPageLoad('admincp.releases')) {
     require_once(ROOT_PATH . '/403.php');
@@ -27,13 +27,13 @@ if (!isset($_GET['action'])) {
 
         $editing_release = ReleasesHelper::getInstance()->getRelease($_GET['id']);
 
-        if ($editing_release == null) {
+        if ($editing_release === null) {
             Redirect::to(URL::build('/panel/releases'));
         }
 
-        if (Input::exists()) { 
+        if (Input::exists()) {
 
-            DB::getInstance()->update('releases', $editing_release['id'], [
+            DB::getInstance()->update('releases', $editing_release->getId(), [
                 'name' => Output::getClean(Input::get('name')),
                 'version_tag' => Output::getClean(Input::get('version_tag')),
                 'github_release_id' => Output::getClean(Input::get('github_release_id')),
@@ -42,8 +42,8 @@ if (!isset($_GET['action'])) {
                 'urgent' => isset($_POST['urgent']) ? 1 : 0,
             ]);
 
-            $cache_key = 'github_release_link-' . $editing_release['id'];
-    
+            $cache_key = 'github_release_link-' . $editing_release->getid();
+
             $cache->setCache('releases');
             if ($cache->isCached($cache_key)) {
                 $cache->erase($cache_key);
@@ -88,7 +88,7 @@ if (!isset($_GET['action'])) {
 
             if (!$validator->passed()) {
                 Session::flash('releases_errors', $validator->errors());
-                
+
                 Redirect::to(URL::build('/panel/releases', 'action=new'));
 
             } else {

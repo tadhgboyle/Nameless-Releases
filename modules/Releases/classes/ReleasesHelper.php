@@ -4,6 +4,9 @@ class ReleasesHelper extends Instanceable
 {
     private array $releases;
 
+    /**
+     * @return Release[]
+     */
     public function getReleases(): array
     {
         if (isset($this->releases)) {
@@ -15,7 +18,7 @@ class ReleasesHelper extends Instanceable
         $releasesFromDatabase = DB::getInstance()->selectQuery("SELECT * FROM nl2_releases ORDER BY created_at DESC")->results();
 
         foreach ($releasesFromDatabase as $release) {
-            $releases[] = [
+            $releases[] = new Release([
                 'id' => (int) $release->id,
                 'name' => $release->name,
                 'version_tag' => $release->version_tag,
@@ -25,16 +28,16 @@ class ReleasesHelper extends Instanceable
                 'urgent' => (bool) $release->urgent,
                 'created_at' => strftime('%B %e, %Y @ %I:%M %p', $release->created_at),
                 'install_instructions' => $release->install_instructions,
-            ];
+            ]);
         }
 
         return $this->releases ??= $releases;
     }
 
-    public function getRelease(int $id): ?object
+    public function getRelease(int $id): ?Release
     {
         foreach ($this->getReleases() as $release) {
-            if ($release['id'] == $id) {
+            if ($release->getId() === $id) {
                 return $release;
             }
         }
@@ -42,10 +45,10 @@ class ReleasesHelper extends Instanceable
         return null;
     }
 
-    public function getUpdateForVersion(string $version): ?object
+    public function getUpdateForVersion(string $version): ?Release
     {
         foreach ($this->getReleases() as $release) {
-            if ($release['required_version'] == $version) {
+            if ($release->isApproved() && $release->getRequiredVersion() === $version) {
                 return $release;
             }
         }

@@ -86,7 +86,7 @@ class Releases_Module extends Module
         $navs[2]->add('releases', 'Releases', URL::build('/panel/releases'), 'top', null, $order + 0.2, $icon);
     }
 
-    function getDebugInfo(): array
+    public function getDebugInfo(): array
     {
         return [];
     }
