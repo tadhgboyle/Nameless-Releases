@@ -11,23 +11,21 @@ class Releases_Module extends Module
 {
     private Language $_language;
 
-    public function __construct(Pages $pages, Language $language)
+    public function __construct(Pages $pages, Language $language, Endpoints $endpoints)
     {
         $this->_language = $language;
 
         $name = 'Releases';
         $author = '<a href="https://tadhg.sh" target="_blank" rel="nofollow noopener">Aberdeener</a>';
         $module_version = '0.1.0';
-        $nameless_version = '2.0.0-pr12';
+        $nameless_version = '2.0.0-pr13';
 
         parent::__construct($this, $name, $author, $module_version, $nameless_version);
 
         $pages->add('Releases', '/panel/releases', 'pages/panel/releases.php');
         $pages->add('Releases', '/panel/releases/edit', 'pages/panel/labels.php');
 
-        $pages->add('Releases', '/api/update_check', 'pages/api/update_check.php');
-        $pages->add('Releases', '/api/latest_update', 'pages/api/latest_update.php');
-        $pages->add('Releases', '/api/all_updates', 'pages/api/all_updates.php');
+        $endpoints->loadEndpoints(ROOT_PATH . '/modules/Releases/includes/endpoints');
     }
 
     public function onInstall()
@@ -35,7 +33,22 @@ class Releases_Module extends Module
         $queries = new Queries();
 
         if (!$queries->tableExists('releases')) {
-            $queries->createTable('releases', "`id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(36) NOT NULL UNIQUE, `version_tag` varchar(36) NOT NULL UNIQUE, `github_release_id` int(11) NOT NULL UNIQUE, `required_version` varchar(36) NOT NULL UNIQUE, `urgent` int(1) NOT NULL, `install_instructions` text NOT NULL, `created_at` int(36) NOT NULL, PRIMARY KEY (id)", "ENGINE=InnoDB DEFAULT CHARSET=latin1");
+            $queries->createTable('releases', "
+                    `id` int(11) NOT NULL AUTO_INCREMENT, 
+                    `name` varchar(36) NOT NULL UNIQUE, 
+                    `version_tag` varchar(36) NOT NULL UNIQUE, 
+                    `github_release_id` int(11) NOT NULL UNIQUE, 
+                    `required_version` varchar(36) NOT NULL UNIQUE, 
+                    `urgent` int(1) NOT NULL, 
+                    `checksum` text NOT NULL, 
+                    `approved` int(1) NOT NULL DEFAULT '0' 
+                    `install_instructions` text NOT NULL, 
+                    `created_by` int(11) NOT NULL, 
+                    `created_at` int(36) NOT NULL,
+                    `approved_by` int(11) NOT NULL,
+                    `approved_at` int(36) NOT NULL,
+                    PRIMARY KEY (id)",
+          "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4");
         }
     }
 

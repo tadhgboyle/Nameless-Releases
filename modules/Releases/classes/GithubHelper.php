@@ -35,6 +35,7 @@ class GithubHelper extends Instanceable {
             }
         }
 
+        // cache for 10 mins due to rate limiting
         $this->cache->store('github_releases', $githubReleases, 600);
 
         return $this->githubReleases ??= $githubReleases;
@@ -58,12 +59,13 @@ class GithubHelper extends Instanceable {
         }
 
         $releaseLink = $this->callGithubApi("https://api.github.com/repos/NamelessMC/Nameless/releases/{$githubReleaseId}")->html_url;
+        // cache for 10 mins due to rate limiting
         $this->cache->store($cacheKey, $releaseLink, 600);
 
         return $releaseLink;
     }
 
-    private function callGithubApi(string $url): object {
+    private function callGithubApi(string $url) {
         return HttpClient::get($url, [
             CURLOPT_ACCEPT_ENCODING => 'application/json',
             CURLINFO_CONTENT_TYPE => 'application/json',

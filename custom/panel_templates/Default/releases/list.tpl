@@ -51,7 +51,7 @@
                             <!-- Success and Error Alerts -->
                             {include file='includes/alerts.tpl'}
 
-                            {if isset($ALL_RELEASES)}
+                            {if count($ALL_RELEASES)}
                             <div class="table-responsive">
                                 <table class="table table-borderless table-striped">
                                     <thead>
@@ -61,6 +61,7 @@
                                             <th>GitHub Release</th>
                                             <th>Required Version</th>
                                             <th>Urgent</th>
+                                            <th>Approved</th>
                                             <th>Created At</th>
                                             <th>Actions</th>
                                         </tr>
@@ -68,20 +69,30 @@
                                     <tbody id="sortable">
                                         {foreach from=$ALL_RELEASES item=release}
                                         <tr>
-                                            <td>{$release['name']}</td>
-                                            <td><kbd>{$release['version_tag']}</kbd></td>
-                                            <td><a href="{$release['github_link']}" target="_blank" class="btn btn-success btn-sm"><i class="fab fa-fw fa-github"></i> Link</a></td>
-                                            <td><kbd>{$release['required_version']}</kbd></td>
+                                            <td>{$release->getName()}</td>
+                                            <td><kbd>{$release->getVersionTag()}</kbd></td>
+                                            <td><a href="{$release->getGithubLink()}" target="_blank" class="btn btn-success btn-sm"><i class="fab fa-fw fa-github"></i> Link</a></td>
+                                            <td><kbd>{$release->getRequiredVersion()}</kbd></td>
                                             <td>
-                                                {if $release['urgent']}
+                                                {if $release->isUrgent()}
                                                     <i class="fa fa-check-circle text-success"></i>
                                                 {else}
                                                     <i class="fa fa-times-circle text-danger"></i>
                                                 {/if}
                                             </td>
-                                            <td>{$release['created_at']}</td>
                                             <td>
-                                                <a href="{$EDIT_LINK}{$release['id']}" class="btn btn-warning btn-sm"><i class="fa fa-fw fa-edit"></i></a>
+                                                {if $release->hasBeenApproved()}
+                                                    <i class="fa fa-check-circle text-success"></i>
+                                                {else}
+                                                    <i class="fa fa-times-circle text-danger"></i>
+                                                {/if}
+                                            </td>
+                                            <td>{$release->getCreatedAt()}</td>
+                                            <td>
+                                                <a href="{$EDIT_LINK}{$release->getId()}" class="btn btn-warning btn-sm"><i class="fa fa-fw fa-edit"></i></a>
+                                                {if !$release->hasBeenApproved() && $release->getCreatedBy() != $USER_ID}
+                                                    <button class="btn btn-success btn-sm" onclick="showApproveModal({$release->getId()})"><i class="fa fa-fw fa-check"></i></button>
+                                                {/if}
                                             </td>
                                         </tr>
                                         {/foreach}
@@ -89,7 +100,7 @@
                                 </table>
                             </div>
                             {else}
-                                'No Releases'
+                                No Releases, give the people an update!
                             {/if}
                         </div>
                     </div>
@@ -112,6 +123,35 @@
     </div>
 
     {include file='scripts.tpl'}
+
+    {if count($ALL_RELEASES)}
+        <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{$ARE_YOU_SURE}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {$CONFIRM_APPROVE_RELEASE}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{$NO}</button>
+                        <a href="{$DELETE_LINK}" id="deleteLink" class="btn btn-primary">{$YES}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function showApproveModal(id) {
+                $('#deleteLink').attr('href', '{$APPROVE_LINK}&id=' + id);
+                $('#deleteModal').modal('show');
+            }
+        </script>
+    {/if}
 
 </body>
 

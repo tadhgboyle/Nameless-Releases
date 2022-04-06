@@ -25,8 +25,11 @@ class ReleasesHelper extends Instanceable {
                 'github_release_id' => $release->github_release_id,
                 'github_link' => GithubHelper::getInstance()->getGithubReleaseLinkFromId($release->github_release_id),
                 'urgent' => (bool)$release->urgent,
-                'created_at' => strftime('%B %e, %Y @ %I:%M %p', $release->created_at),
+                'checksum' => $release->checksum,
                 'install_instructions' => $release->install_instructions,
+                'created_at' => date(DATE_FORMAT, $release->created_at),
+                'created_by' => $release->created_by,
+                'approved' => (bool)$release->approved,
             ]);
         }
 
@@ -45,7 +48,7 @@ class ReleasesHelper extends Instanceable {
 
     public function getUpdateForVersion(string $version): ?Release {
         foreach ($this->getReleases() as $release) {
-            if ($release->isApproved() && $release->getRequiredVersion() === $version) {
+            if ($release->hasBeenApproved() && $release->getRequiredVersion() === $version) {
                 return $release;
             }
         }

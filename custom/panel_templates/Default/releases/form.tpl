@@ -50,31 +50,35 @@
                             <form role="form" action="" method="post">
                                 <div class="form-group">
                                     <label for="name">Name</label>
-                                    <input type="text" name="name" class="form-control" id="name" value="{$EDITING_RELEASE['name']}">
+                                    <input type="text" name="name" class="form-control" id="name" placeholder="Full name of this release" value="{if ($EDITING_RELEASE)}{$EDITING_RELEASE->getName()}{/if}">
                                 </div>
                                 <div class="form-group">
                                     <label for="version_tag">Version Tag</label>
-                                    <input type="text" name="version_tag" class="form-control" id="version_tag" value="{$EDITING_RELEASE['version_tag']}">
+                                    <input type="text" name="version_tag" class="form-control" id="version_tag" placeholder="What to display in StaffCP as the NamelessMC version" value="{if ($EDITING_RELEASE)}{$EDITING_RELEASE->getVersionTag()}{/if}">
                                 </div>
                                 <div class="form-group">
                                     <label for="github_release_id">GitHub Release</label>
                                     <select class="form-control" name="github_release_id" id="github_release_id">
                                         {foreach from=$GITHUB_RELEASES item=release}
-                                            <option value="{$release->id}" {if $EDITING_RELEASE['github_release_id'] == $release->id} selected {/if}>{$release->name}</option>
+                                            <option value="{$release->id}" {if $EDITING_RELEASE && $EDITING_RELEASE->getGithubReleaseId() == $release->id} selected {/if}>{$release->name}</option>
                                         {/foreach}
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label for="required_version">Required Version</label>
-                                    <input type="text" name="required_version" class="form-control" id="required_version" value="{$EDITING_RELEASE['required_version']}">
+                                    <input type="text" name="required_version" class="form-control" id="required_version" placeholder="The version tag required to get this update" value="{if ($EDITING_RELEASE)}{$EDITING_RELEASE->getRequiredVersion()}{/if}">
                                 </div>
                                 <div class="form-group">
                                     <label for="urgent">Urgent</label>
-                                    <input type="checkbox" id="urgent" name="urgent" value="1" {if $EDITING_RELEASE['urgent']} checked{/if} />
+                                    <input id="urgent" name="urgent" type="checkbox" {if $EDITING_RELEASE && $EDITING_RELEASE->isUrgent() eq 1}checked{/if} />
                                 </div>
                                 <div class="form-group">
-                                    <label for="install_instructions">Install Instructions (HTML)</label>
-                                    <textarea name="install_instructions" id="install_instructions" class="form-control" rows="15">{if $EDITING_RELEASE['install_instructions']} {$EDITING_RELEASE['install_instructions']} {/if}</textarea>
+                                    <label for="checksum">Checksum</label>
+                                    <textarea name="checksum" id="checksum" class="form-control" rows="5">{if ($EDITING_RELEASE)}{$EDITING_RELEASE->getChecksum()}{/if}</textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="install_instructions">Install Instructions</label>
+                                    <textarea style="width:100%" rows="10" name="install_instructions" id="install_instructions">{if $EDITING_RELEASE}{$EDITING_RELEASE->getInstallInstructions()}{/if}</textarea>
                                 </div>
                                 <div class="form-group">
                                     <input type="hidden" name="token" value="{$TOKEN}">

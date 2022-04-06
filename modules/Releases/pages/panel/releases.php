@@ -1,15 +1,13 @@
 <?php
 
-// TODO: release deleting + approval
-
 if (!$user->handlePanelPageLoad('admincp.releases')) {
     require_once(ROOT_PATH . '/403.php');
     die();
 }
 
-define('PAGE', 'panel');
-define('PARENT_PAGE', 'releases');
-define('PANEL_PAGE', 'releases');
+const PAGE = 'panel';
+const PARENT_PAGE = 'releases';
+const PANEL_PAGE = 'releases';
 $page_title = 'Releases';
 require_once(ROOT_PATH . '/core/templates/backend_init.php');
 
@@ -38,6 +36,7 @@ if (!isset($_GET['action'])) {
                 'version_tag' => Output::getClean(Input::get('version_tag')),
                 'github_release_id' => Output::getClean(Input::get('github_release_id')),
                 'required_version' => Output::getClean(Input::get('required_version')),
+                'checksum' => Output::getClean(Input::get('checksum')),
                 'install_instructions' => Output::getClean(Input::get('install_instructions')),
                 'urgent' => isset($_POST['urgent']) ? 1 : 0,
             ]);
@@ -52,11 +51,8 @@ if (!isset($_GET['action'])) {
             GithubHelper::getInstance()->resetCache();
 
             Session::flash('releases_success', 'Updated a Release: ' . Input::get('name'));
-
             Redirect::to(URL::build('/panel/releases'));
-
         } else {
-
             $smarty->assign(array(
                 'EDITING_RELEASE' => $editing_release,
             ));
@@ -66,7 +62,7 @@ if (!isset($_GET['action'])) {
 
         if (Input::exists()) {
 
-            $validator = (new Validate())->check($_POST, [
+            $validator = Validate::check($_POST, [
                 'name' => [
                     Validate::REQUIRED,
                     Validate::UNIQUE => 'releases'
@@ -83,14 +79,14 @@ if (!isset($_GET['action'])) {
                     Validate::REQUIRED,
                     Validate::UNIQUE => 'releases'
                 ],
+                'urgent' => Validate::REQUIRED,
+                'checksum' => Validate::REQUIRED,
                 'install_instructions' => Validate::REQUIRED
             ]);
 
             if (!$validator->passed()) {
                 Session::flash('releases_errors', $validator->errors());
-
                 Redirect::to(URL::build('/panel/releases', 'action=new'));
-
             } else {
 
                 DB::getInstance()->insert('releases', [
@@ -99,17 +95,36 @@ if (!isset($_GET['action'])) {
                     'required_version' => Output::getClean(Input::get('required_version')),
                     'github_release_id' => Output::getClean(Input::get('github_release_id')),
                     'urgent' => isset($_POST['urgent']) ? 1 : 0,
-                    'install_instructions' => Output::getClean(Input::get('install_instructions')),
+                    'checksum' => Output::getClean(Input::get('checksum')),
+                    'install_instructions' => Input::get('install_instructions'),
+                    'created_by' => $user->data()->id,
                     'created_at' => time(),
                 ]);
 
                 GithubHelper::getInstance()->resetCache();
 
                 Session::flash('releases_success', 'Created new Release: ' . Input::get('name'));
-
                 Redirect::to(URL::build('/panel/releases'));
             }
         }
+    } else if ($_GET['action'] === 'approve') {
+
+        $release = ReleasesHelper::getInstance()->getRelease($_GET['id']);
+        if ($release === null || $release->hasBeenApproved() || $release->getCreatedBy() == $user->data()->id) {
+            Session::flash('releases_errors', 'Could not find release or you do not have permission to approve this release, or it was already approved.');
+            Redirect::to(URL::build('/panel/releases'));
+        }
+
+        DB::getInstance()->update('releases', $release->getId(), [
+            'approved' => 1,
+            'approved_by' => $user->data()->id,
+            'approved_at' => time(),
+        ]);
+
+        GithubHelper::getInstance()->resetCache();
+
+        Session::flash('releases_success', 'Approved Release: ' . $release->getName() . '. Users will begin to see this release in their StaffCP soon.\nI hope #support is open!');
+        Redirect::to(URL::build('/panel/releases'));
     }
 
     $smarty->assign(array(
@@ -126,7 +141,7 @@ Module::loadPage($user, $pages, $cache, $smarty, array($navigation, $cc_nav, $st
 if (Session::exists('releases_errors')) {
     $smarty->assign(array(
         'ERRORS_TITLE' => $language->get('general', 'error'),
-        'ERRORS' => Session::flash('releases_errors')
+        'ERRORS' => [Session::flash('releases_errors')]
     ));
 }
 
@@ -137,16 +152,25 @@ if (Session::exists('releases_success')) {
     ));
 }
 
+$template->addJSFiles([
+    (defined('CONFIG_PATH') ? CONFIG_PATH : '') . '/core/assets/plugins/tinymce/tinymce.min.js' => []
+]);
+
+$template->addJSScript(Input::createTinyEditor($language, 'install_instructions'));
+
 $smarty->assign(array(
     'PAGE' => PANEL_PAGE,
     'PARENT_PAGE' => PARENT_PAGE,
     'DASHBOARD' => $language->get('admin', 'dashboard'),
     'TOKEN' => Token::get(),
     'NEW_LINK' => URL::build('/panel/releases', 'action=new'),
+    'APPROVE_LINK' => URL::build('/panel/releases', 'action=approve'),
+    'USER_ID' => $user->data()->id,
+    'ARE_YOU_SURE' => $language->get('general', 'are_you_sure'),
+    'YES' => $language->get('general', 'yes'),
+    'NO' => $language->get('general', 'no'),
+    'CONFIRM_APPROVE_RELEASE' => 'Are you sure you want to approve this release? This will make it public and available to users.',
 ));
-
-$page_load = microtime(true) - $start;
-define('PAGE_LOAD_TIME', str_replace('{x}', round($page_load, 3), $language->get('general', 'page_loaded_in')));
 
 $template->onPageLoad();
 

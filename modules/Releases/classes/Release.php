@@ -7,13 +7,16 @@ class Release {
     private string $version_tag;
     private string $required_version;
     private int $github_release_id;
-    private string $github_release_link;
+    private string $github_link;
     private bool $urgent;
     private string $created_at;
+    private string $checksum;
     private string $install_instructions;
+    private int $created_by;
     private bool $approved;
 
     public function __construct(array $data) {
+        // todo
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
@@ -39,8 +42,8 @@ class Release {
         return $this->github_release_id;
     }
 
-    public function getGithubReleaseLink(): string {
-        return $this->github_release_link;
+    public function getGithubLink(): string {
+        return $this->github_link;
     }
 
     public function isUrgent(): bool {
@@ -51,11 +54,19 @@ class Release {
         return $this->created_at;
     }
 
+    public function getChecksum(): string {
+        return $this->checksum;
+    }
+
     public function getInstallInstructions(): string {
         return $this->install_instructions;
     }
 
-    public function isApproved(): bool {
+    public function getCreatedBy(): int {
+        return $this->created_by;
+    }
+
+    public function hasBeenApproved(): bool {
         return $this->approved;
     }
 
@@ -64,8 +75,9 @@ class Release {
             'name' => $this->getName(),
             'version_tag' => $this->getVersionTag(),
             'required_version' => $this->getRequiredVersion(),
-            'github_link' => $this->getGithubReleaseLink(),
+            'github_link' => $this->getGithubLink(),
             'urgent' => $this->isUrgent(),
+            'checksum' => $this->getChecksum(),
             'install_instructions' => $this->getInstallInstructions(),
         ];
     }
