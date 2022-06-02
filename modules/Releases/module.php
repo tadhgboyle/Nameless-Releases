@@ -41,7 +41,7 @@ class Releases_Module extends Module
                     `required_version` varchar(36) NOT NULL UNIQUE, 
                     `urgent` int(1) NOT NULL, 
                     `checksum` text NOT NULL, 
-                    `approved` int(1) NOT NULL DEFAULT '0' 
+                    `approved` int(1) NOT NULL DEFAULT '0',
                     `install_instructions` text NOT NULL, 
                     `created_by` int(11) NOT NULL, 
                     `created_at` int(36) NOT NULL,
