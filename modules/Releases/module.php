@@ -30,25 +30,23 @@ class Releases_Module extends Module
 
     public function onInstall()
     {
-        $queries = new Queries();
-
-        if (!$queries->tableExists('releases')) {
-            $queries->createTable('releases', "
-                    `id` int(11) NOT NULL AUTO_INCREMENT, 
-                    `name` varchar(36) NOT NULL UNIQUE, 
-                    `version_tag` varchar(36) NOT NULL UNIQUE, 
-                    `github_release_id` int(11) NOT NULL UNIQUE, 
-                    `required_version` varchar(36) NOT NULL UNIQUE, 
-                    `urgent` int(1) NOT NULL, 
-                    `checksum` text NOT NULL, 
-                    `approved` int(1) NOT NULL DEFAULT '0',
-                    `install_instructions` text NOT NULL, 
-                    `created_by` int(11) NOT NULL, 
-                    `created_at` int(36) NOT NULL,
-                    `approved_by` int(11) NOT NULL,
-                    `approved_at` int(36) NOT NULL,
-                    PRIMARY KEY (id)",
-          "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4");
+        if (!DB::getInstance()->showTables('releases')) {
+            DB::getInstance()->createTable('releases',
+                "`id` int(11) NOT NULL AUTO_INCREMENT, 
+                 `name` varchar(36) NOT NULL UNIQUE, 
+                 `version_tag` varchar(36) NOT NULL UNIQUE, 
+                 `github_release_id` int(11) NOT NULL UNIQUE, 
+                 `required_version` varchar(36) NOT NULL UNIQUE, 
+                 `urgent` int(1) NOT NULL, 
+                 `checksum` text NOT NULL, 
+                 `approved` int(1) NOT NULL DEFAULT '0',
+                 `install_instructions` text NOT NULL, 
+                 `created_by` int(11) NOT NULL, 
+                 `created_at` int(36) NOT NULL,
+                 `approved_by` int(11) NOT NULL,
+                 `approved_at` int(36) NOT NULL,
+                  PRIMARY KEY (id)"
+            );
         }
     }
 
