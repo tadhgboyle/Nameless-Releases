@@ -43,8 +43,8 @@ class Releases_Module extends Module
                  `install_instructions` text NOT NULL, 
                  `created_by` int(11) NOT NULL, 
                  `created_at` int(36) NOT NULL,
-                 `approved_by` int(11) NOT NULL,
-                 `approved_at` int(36) NOT NULL,
+                 `approved_by` int(11) NULL DEFAULT NULL,
+                 `approved_at` int(36) NULL DEFAULT NULL,
                   PRIMARY KEY (id)"
             );
         }

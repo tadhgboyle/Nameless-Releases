@@ -33,12 +33,12 @@ if (!isset($_GET['action'])) {
             Redirect::to(URL::build('/panel/releases'));
         }
 
-        if (Input::get('version_tag') == Input::get('required_version')) {
-            Session::flash('releases_errors', 'Version tag must be different from required version');
-            Redirect::to(URL::build('/panel/releases', 'action=new'));
-        }
-
         if (Input::exists()) {
+
+            if (Input::get('version_tag') == Input::get('required_version')) {
+                Session::flash('releases_errors', 'Version tag must be different from required version');
+                Redirect::to(URL::build('/panel/releases', 'action=edit&id=' . $editing_release->getId()));
+            }
 
             DB::getInstance()->update('releases', $editing_release->getId(), [
                 'name' => Output::getClean(Input::get('name')),
