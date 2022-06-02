@@ -11,6 +11,10 @@ const PANEL_PAGE = 'releases';
 $page_title = 'Releases';
 require_once(ROOT_PATH . '/core/templates/backend_init.php');
 
+$template->assets()->include([
+    AssetTree::TINYMCE,
+]);
+
 if (!isset($_GET['action'])) {
     $smarty->assign(array(
         'NONE' => $language->get('general', 'none'),
@@ -27,6 +31,11 @@ if (!isset($_GET['action'])) {
 
         if ($editing_release === null) {
             Redirect::to(URL::build('/panel/releases'));
+        }
+
+        if (Input::get('version_tag') == Input::get('required_version')) {
+            Session::flash('releases_errors', 'Version tag must be different from required version');
+            Redirect::to(URL::build('/panel/releases', 'action=new'));
         }
 
         if (Input::exists()) {
@@ -88,6 +97,11 @@ if (!isset($_GET['action'])) {
                 Session::flash('releases_errors', $validator->errors());
                 Redirect::to(URL::build('/panel/releases', 'action=new'));
             } else {
+
+                if (Input::get('version_tag') == Input::get('required_version')) {
+                    Session::flash('releases_errors', 'Version tag must be different from required version');
+                    Redirect::to(URL::build('/panel/releases', 'action=new'));
+                }
 
                 DB::getInstance()->insert('releases', [
                     'name' => Output::getClean(Input::get('name')),
@@ -151,10 +165,6 @@ if (Session::exists('releases_success')) {
         'SUCCESS' => Session::flash('releases_success')
     ));
 }
-
-$template->assets()->include([
-    AssetTree::TINYMCE,
-]);
 
 $template->addJSScript(Input::createTinyEditor($language, 'install_instructions'));
 
