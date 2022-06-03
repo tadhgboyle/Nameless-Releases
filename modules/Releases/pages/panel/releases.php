@@ -137,7 +137,7 @@ if (!isset($_GET['action'])) {
 
         GithubHelper::getInstance()->resetCache();
 
-        Session::flash('releases_success', 'Approved Release: ' . $release->getName() . '. Users will begin to see this release in their StaffCP soon.\nI hope #support is open!');
+        Session::flash('releases_success', 'Approved Release: ' . $release->getName() . '. Users will begin to see this release in their StaffCP soon. I hope #support is open!');
         Redirect::to(URL::build('/panel/releases'));
     }
 
