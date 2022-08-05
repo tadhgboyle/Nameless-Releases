@@ -24,6 +24,7 @@ class ReleasesHelper extends Instanceable {
                 'required_version' => $release->required_version,
                 'github_release_id' => $release->github_release_id,
                 'github_link' => GithubHelper::getInstance()->getGithubReleaseLinkFromId($release->github_release_id),
+                'upgrade_zip_link' => $release->upgrade_zip_link,
                 'urgent' => (bool)$release->urgent,
                 'checksum' => $release->checksum,
                 'install_instructions' => $release->install_instructions,

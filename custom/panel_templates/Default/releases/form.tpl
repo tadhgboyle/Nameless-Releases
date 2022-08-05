@@ -69,6 +69,10 @@
                                     <input type="text" name="required_version" class="form-control" id="required_version" placeholder="The version tag required to get this update" value="{if ($EDITING_RELEASE)}{$EDITING_RELEASE->getRequiredVersion()}{/if}">
                                 </div>
                                 <div class="form-group">
+                                    <label for="upgrade_zip_link">Upgrade zip link</label>
+                                    <input type="text" name="upgrade_zip_link" class="form-control" id="upgrade_zip_link" placeholder="The URL of the upgrade zip" value="{if ($EDITING_RELEASE)}{$EDITING_RELEASE->getUpgradeZipLink()}{/if}">
+                                </div>
+                                <div class="form-group">
                                     <label for="urgent">Urgent</label>
                                     <input id="urgent" name="urgent" type="checkbox" {if $EDITING_RELEASE && $EDITING_RELEASE->isUrgent() eq 1}checked{/if} />
                                 </div>

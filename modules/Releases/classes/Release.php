@@ -8,6 +8,7 @@ class Release {
     private string $required_version;
     private int $github_release_id;
     private string $github_link;
+    private string $upgrade_zip_link;
     private bool $urgent;
     private string $created_at;
     private string $checksum;
@@ -46,6 +47,10 @@ class Release {
         return $this->github_link;
     }
 
+    public function getUpgradeZipLink(): string {
+        return $this->upgrade_zip_link;
+    }
+
     public function isUrgent(): bool {
         return $this->urgent;
     }
@@ -76,6 +81,7 @@ class Release {
             'version_tag' => $this->getVersionTag(),
             'required_version' => $this->getRequiredVersion(),
             'github_link' => $this->getGithubLink(),
+            'upgrade_zip_link' => $this->getUpgradeZipLink(),
             'urgent' => $this->isUrgent(),
             'checksum' => $this->getChecksum(),
             'install_instructions' => $this->getInstallInstructions(),

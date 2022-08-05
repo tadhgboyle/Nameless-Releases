@@ -44,6 +44,7 @@ if (!isset($_GET['action'])) {
                 'name' => Output::getClean(Input::get('name')),
                 'version_tag' => Output::getClean(Input::get('version_tag')),
                 'github_release_id' => Output::getClean(Input::get('github_release_id')),
+                'upgrade_zip_link' => Output::getClean(Input::get('upgrade_zip_link')),
                 'required_version' => Output::getClean(Input::get('required_version')),
                 'checksum' => Output::getClean(Input::get('checksum')),
                 'install_instructions' => Output::getClean(Input::get('install_instructions')),
@@ -88,6 +89,7 @@ if (!isset($_GET['action'])) {
                     Validate::REQUIRED,
                     Validate::UNIQUE => 'releases'
                 ],
+                'upgrade_zip_link' => Validate::REQUIRED,
                 'urgent' => Validate::REQUIRED,
                 'checksum' => Validate::REQUIRED,
                 'install_instructions' => Validate::REQUIRED
@@ -107,6 +109,7 @@ if (!isset($_GET['action'])) {
                     'name' => Output::getClean(Input::get('name')),
                     'version_tag' => Output::getClean(Input::get('version_tag')),
                     'required_version' => Output::getClean(Input::get('required_version')),
+                    'upgrade_zip_link' => Output::getClean(Input::get('upgrade_zip_link')),
                     'github_release_id' => Output::getClean(Input::get('github_release_id')),
                     'urgent' => isset($_POST['urgent']) ? 1 : 0,
                     'checksum' => Output::getClean(Input::get('checksum')),
