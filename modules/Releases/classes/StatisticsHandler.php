@@ -5,12 +5,13 @@ class StatisticsHandler
 
     public static function handleRequest(array $data): void {
         try {
-            $mysqli = new mysqli(Config::get('stats_credentials'));
+            $db = DB::getCustomInstance(
+                Config::get('stats_credentials.host'),
+                Config::get('stats_credentials.db'),
+                Config::get('stats_credentials.username'),
+                Config::get('stats_credentials.password')
+            );
         } catch (Exception $e) {
-            return;
-        }
-
-        if ($mysqli->connect_errno) {
             return;
         }
 
@@ -26,9 +27,7 @@ class StatisticsHandler
             return;
         }
 
-        $uid = $mysqli->real_escape_string($data['uid']);
-
-        if (strlen($uid) !== 62) {
+        if (strlen($data['uid']) !== 62) {
             return;
         }
 
@@ -40,50 +39,25 @@ class StatisticsHandler
         if (isset($data['php_version'])) {
             $php_version = explode('.', $data['php_version']);
             $php_version = count($php_version) >= 2 ? ($php_version[0] . '.' . $php_version[1]) : $php_version[0];
-            $php_version = $mysqli->real_escape_string($php_version);
         }
-
-        $version = $mysqli->real_escape_string($data['version']);
-
-        $stmt = $mysqli->prepare("SELECT uniqueid FROM nl2_nl_stats WHERE uniqueid = ?");
-        $stmt->bind_param("s", $data['uid']);
-        $stmt->execute();
-        $stmt->store_result();
 
         $date = date('U');
 
-        if ($stmt->num_rows > 0) {
-            $stmt_update = $mysqli->prepare("UPDATE nl2_nl_stats SET `version` = ?, `last_queried` = ?, `php_version` = ? WHERE `uniqueid` = ?");
-
-            if (!$stmt_update) {
-                return;
-            }
-
-            $stmt_update->bind_param("siss", $version, $date, $php_version, $uid);
-
-            if (!$stmt_update->execute()) {
-                return;
-            }
-
-            $stmt_update->close();
+        if ($db->query('SELECT COUNT(*) AS total FROM nl2_nl_stats WHERE `uniqueid` = ?', [$data['uid']])->first()->total) {
+            $db->query('UPDATE nl2_nl_stats SET `version` = ?, `last_queried` = ?, `php_version` = ? WHERE `uniqueid` = ?', [
+                $data['version'],
+                $date,
+                $php_version,
+                $data['uid'],
+            ]);
         } else {
-            $stmt_insert = $mysqli->prepare("INSERT INTO nl2_nl_stats (`uniqueid`, `version`, `date`, `last_queried`, `php_version`) VALUES (?, ?, ?, ?, ?)");
-
-            if (!$stmt_insert) {
-                return;
-            }
-
-            $stmt_insert->bind_param("ssiis", $uid, $version, $date, $date, $php_version);
-
-            if (!$stmt_insert->execute()) {
-                return;
-            }
-
-            $stmt_insert->close();
+            $db->query('INSERT INTO nl2_nl_stats (`uniqueid`, `version`, `date`, `last_queried`, `php_version`) VALUES (?, ?, ?, ?, ?)', [
+                $data['uid'],
+                $data['version'],
+                $date,
+                $date,
+                $php_version,
+            ]);
         }
-
-        $stmt->free_result();
-        $stmt->close();
-        $mysqli->close();
     }
 }
