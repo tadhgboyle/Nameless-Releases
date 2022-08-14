@@ -96,10 +96,9 @@ if (!isset($_GET['action'])) {
             ]);
 
             if (!$validator->passed()) {
-                Session::flash('releases_errors', $validator->errors());
-                Redirect::to(URL::build('/panel/releases', 'action=new'));
-            } else {
+                $errors = $validator->errors();
 
+            } else {
                 if (Input::get('version_tag') == Input::get('required_version')) {
                     Session::flash('releases_errors', 'Version tag must be different from required version');
                     Redirect::to(URL::build('/panel/releases', 'action=new'));
@@ -156,9 +155,13 @@ if (!isset($_GET['action'])) {
 Module::loadPage($user, $pages, $cache, $smarty, array($navigation, $cc_nav, $staffcp_nav), $widgets, $template);
 
 if (Session::exists('releases_errors')) {
+    $errors = Session::flash('releases_errors');
+}
+
+if (isset($errors) && count($errors)) {
     $smarty->assign(array(
         'ERRORS_TITLE' => $language->get('general', 'error'),
-        'ERRORS' => [Session::flash('releases_errors')]
+        'ERRORS' => $errors,
     ));
 }
 
