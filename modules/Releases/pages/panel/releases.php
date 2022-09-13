@@ -172,7 +172,7 @@ if (Session::exists('releases_success')) {
     ));
 }
 
-$template->addJSScript(Input::createTinyEditor($language, 'install_instructions'));
+$template->addJSScript(Input::createTinyEditor($language, 'install_instructions', null, false, true));
 
 $smarty->assign(array(
     'PAGE' => PANEL_PAGE,
