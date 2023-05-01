@@ -14,7 +14,7 @@ class ReleasesHelper extends Instanceable {
 
         $releases = [];
 
-        $releasesFromDatabase = DB::getInstance()->selectQuery("SELECT * FROM nl2_releases ORDER BY created_at DESC")->results();
+        $releasesFromDatabase = DB::getInstance()->query("SELECT * FROM nl2_releases ORDER BY created_at DESC")->results();
 
         foreach ($releasesFromDatabase as $release) {
             $releases[] = new Release([
